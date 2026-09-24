@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Estudo — Complexidade de Algoritmos (G1)</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<button class="menu-btn" id="menuBtn">☰ Menu</button>
+<div class="layout">
+<nav id="nav">
+  <h1>Complexidade de Algoritmos<small>Revisão para a G1 · Prof. Leonardo Sápiras</small></h1>
+  <a href="#home" data-p="home">🏠 Início</a>
+  <div class="grp">Teoria</div>
+  <a href="#conceitos" data-p="conceitos">1 · Conceitos</a>
+  <a href="#notacoes" data-p="notacoes">2 · Notações O, Θ, Ω</a>
+  <a href="#recorrencias" data-p="recorrencias">3 · Recorrências</a>
+  <a href="#mestre" data-p="mestre">4 · Método mestre</a>
+  <a href="#dc" data-p="dc">5 · Divisão e conquista</a>
+  <a href="#heap" data-p="heap">6 · Heap sort</a>
+  <a href="#outros" data-p="outros">7 · Bubble e Quick sort</a>
+  <div class="grp">Praticar</div>
+  <a href="#prova" data-p="prova">⏱️ Prova simulada</a>
+  <a href="#quiz" data-p="quiz">📝 Quiz</a>
+  <a href="#dissertativas" data-p="dissertativas">✍️ Lista de revisão G1</a>
+  <a href="#mestrelab" data-p="mestrelab">🎲 Treino do método mestre</a>
+  <div class="grp">Laboratórios</div>
+  <a href="#crescimento" data-p="crescimento">📈 Ordem de crescimento</a>
+  <a href="#vizmerge" data-p="vizmerge">🔀 Simulador Merge sort</a>
+  <a href="#vizheap" data-p="vizheap">🌳 Simulador Heap sort</a>
+</nav>
+
+<main>
+<!-- ===================== HOME ===================== -->
+<section class="page" id="home">
+  <h2>Complexidade de Algoritmos</h2>
+  <p class="lead">Material de estudo montado a partir dos slides (Aula 2, Aula 4, Recorrências) e da lista “Exercícios de revisão para G1”.</p>
+  <div class="stats" id="homeStats"></div>
+  <h3>Por onde começar</h3>
+  <div class="cta">
+    <a href="#prova"><b>⏱️ Prova simulada</b>Método mestre, com cronômetro e nota.</a>
+    <a href="#conceitos"><b>1. Teoria</b>Leia os tópicos na ordem do menu (1 → 7).</a>
+    <a href="#quiz"><b>2. Quiz</b>Múltipla escolha com explicação de cada resposta.</a>
+    <a href="#dissertativas"><b>3. Lista G1</b>As 17 questões do professor, com resposta-modelo.</a>
+    <a href="#mestrelab"><b>4. Treino</b>Gerador infinito de recorrências para o método mestre.</a>
+  </div>
+  <h3>Cola rápida</h3>
+  <div class="card">
+    <p><b>Ordem de crescimento (menor → maior):</b><br>
+    O(1) &lt; O(log n) &lt; O(n) &lt; O(n log n) &lt; O(n²) &lt; O(n³) &lt; O(2ⁿ) &lt; O(n!) &lt; O(nⁿ)</p>
+    <div class="tablewrap"><table>
+    <tr><th>Algoritmo</th><th>Melhor</th><th>Médio</th><th>Pior</th></tr>
+    <tr><td>Bubble sort</td><td>O(n) (com flag de parada)</td><td>O(n²)</td><td>O(n²)</td></tr>
+    <tr><td>Merge sort</td><td>O(n log n)</td><td>O(n log n)</td><td>O(n log n)</td></tr>
+    <tr><td>Heap sort</td><td>O(n log n)</td><td>O(n log n)</td><td>O(n log n)</td></tr>
+    <tr><td>Quick sort</td><td>O(n log n)</td><td>O(n log n)</td><td>O(n²)</td></tr>
+    <tr><td>Busca binária</td><td>O(1)</td><td>O(log n)</td><td>O(log n)</td></tr>
+    </table></div>
+    <p><b>Método mestre:</b> T(n) = aT(n/b) + f(n). Compare f(n) com n<sup>log<sub>b</sub>a</sup>: menor → Θ(n<sup>log<sub>b</sub>a</sup>); igual → Θ(n<sup>log<sub>b</sub>a</sup> · log n); maior (+ regularidade) → Θ(f(n)).</p>
+  </div>
+  <p style="color:var(--muted);font-size:.85rem">Seu progresso é salvo neste navegador (localStorage).</p>
+</section>
+
+<!-- ===================== CONCEITOS ===================== -->
+<section class="page" id="conceitos">
+  <h2>1 · Conceitos de análise de complexidade</h2>
+  <p class="lead">Aula 2 — Conceitos</p>
+
+  <div class="card def">
+    <b>Complexidade de um algoritmo</b> = número de instruções básicas executadas em função do tamanho da entrada.
+  </div>
+
+  <h3>Premissas da análise</h3>
+  <ul>
+    <li>Máquina genérica.</li>
+    <li>O custo específico de cada operação é desprezado — <i>“uma instrução é uma instrução”</i>.</li>
+    <li>O efeito dos múltiplos níveis de memória (cache, RAM, disco) não é considerado.</li>
+  </ul>
+  <div class="card tip">⚠️ Essas premissas são <b>falsas</b> quando um algoritmo precisa ser otimizado para um ambiente específico. É por isso que o mesmo algoritmo pode ter tempos diferentes em ambientes diferentes (questão 17 da lista).</div>
+
+  <h3>Complexidade espacial × temporal</h3>
+  <div class="tablewrap"><table>
+    <tr><th>Espacial</th><th>Temporal</th></tr>
+    <tr><td>Quantidade de <b>recursos</b> necessários para resolver o problema: memória, hardware, banda.</td>
+        <td>Quantidade de <b>tempo</b> (ou número de instruções) necessária. Principal fator: <b>tamanho da entrada (n)</b>.</td></tr>
+  </table></div>
+  <p><b>Tamanho da entrada (n)</b> = quantidade de itens na entrada (“tamanho do problema” ou da instância). <b>Tempo de execução</b> = quantidade de instruções (cada uma pode levar um tempo diferente na prática).</p>
+
+  <h3>Melhor, médio e pior caso</h3>
+  <ul>
+    <li><b>Melhor caso</b>: a entrada mais favorável.</li>
+    <li><b>Caso médio</b>: geralmente o que tem maior probabilidade de ocorrer.</li>
+    <li><b>Pior caso</b>: <b>nosso foco</b>. Existem algoritmos em que o pior caso é o mais frequente (ex.: buscar um item ausente numa lista).</li>
+  </ul>
+
+  <h3>Ordem de crescimento: por que ignorar constantes e termos menores?</h3>
+  <p>Ao comparar algoritmos ignoramos constantes (somas e multiplicações) e componentes de mais baixa ordem. Ex.: <code>c₁n² + c₂n + c₃ = Θ(n²)</code>. À medida que n cresce, o termo de maior ordem representa quase todo o resultado.</p>
+  <div class="card">
+    <b>Exemplo: n² + n</b>
+    <div class="tablewrap"><table>
+      <tr><th>n</th><th>n²</th><th>n² + n</th><th>“parte do n”</th></tr>
+      <tr><td>10</td><td>100</td><td>110</td><td>9,1 %</td></tr>
+      <tr><td>100</td><td>10.000</td><td>10.100</td><td>0,99 %</td></tr>
+      <tr><td>1.000</td><td>1.000.000</td><td>1.001.000</td><td>0,1 %</td></tr>
+      <tr><td>1.000.000</td><td>10¹²</td><td>10¹² + 10⁶</td><td>0,0001 %</td></tr>
+    </table></div>
+    Formalmente: n² + n ≤ 2n² para todo n ≥ 1 (c = 2, n₀ = 1) ⇒ n² + n = O(n²).
+  </div>
+
+  <h3>Nomes das ordens</h3>
+  <div class="tablewrap"><table>
+    <tr><th>Notação</th><th>Nome</th></tr>
+    <tr><td>O(1)</td><td>constante</td></tr>
+    <tr><td>O(log n)</td><td>logarítmica</td></tr>
+    <tr><td>O((log n)<sup>c</sup>)</td><td>poli-logarítmica</td></tr>
+    <tr><td>O(n)</td><td>linear</td></tr>
+    <tr><td>O(n log n)</td><td>linear-logarítmica</td></tr>
+    <tr><td>O(n²)</td><td>quadrática</td></tr>
+    <tr><td>O(n³)</td><td>cúbica</td></tr>
+    <tr><td>O(n<sup>c</sup>)</td><td>polinomial</td></tr>
+    <tr><td>O(c<sup>n</sup>)</td><td>exponencial</td></tr>
+    <tr><td>O(n!)</td><td>fatorial</td></tr>
+    <tr><td>O(n<sup>n</sup>)</td><td>“exponencial” (pior ainda que n!)</td></tr>
+  </table></div>
+  <p>Veja o efeito prático no <a href="#crescimento">laboratório de ordem de crescimento</a>. Exemplo da tabela do slide: com n = 30, 2ⁿ leva ~18 min; já n! leva um tempo astronômico (o slide indica 10²⁵ anos).</p>
+
+  <h3>Contando instruções em código (exemplos dos slides)</h3>
+  <pre><code>n = &lt;entrada&gt;
+print "Algoritmo"           // 1 instrução
+for (i=0; i &lt; n; i++) {
+    print i                 // repete n vezes
+}
+print "Fim"                 // 1 instrução</code></pre>
+  <p>Total: 3 + n instruções. Para n = 100.000, 3 instruções são irrelevantes ⇒ <b>O(n)</b> (linear).</p>
+  <div class="tablewrap"><table>
+    <tr><th>Estrutura</th><th>Complexidade</th></tr>
+    <tr><td>Dois laços <b>em sequência</b> de n</td><td>n + n = 2n ⇒ O(n)</td></tr>
+    <tr><td>Dois laços <b>aninhados</b> de n</td><td>n · n ⇒ O(n²)</td></tr>
+    <tr><td>Aninhado (n²) + laço simples (n)</td><td>n² + n ⇒ O(n²)</td></tr>
+    <tr><td>Laço em que a variável dobra (<code>w = w*2</code>)</td><td>O(log n)</td></tr>
+    <tr><td><code>if (n ≥ 100)</code> guardando um laço duplo</td><td>pior caso: O(n²) (a condição não muda a ordem)</td></tr>
+  </table></div>
+  <div class="card tip"><b>Regra de ouro:</b> sequência → soma (fica o maior); aninhamento → multiplicação; variável que dobra/divide por 2 → logaritmo.</div>
+</section>
+
+<!-- ===================== NOTAÇÕES ===================== -->
+<section class="page" id="notacoes">
+  <h2>2 · Notação assintótica: O, Θ, Ω, o, ω</h2>
+  <p class="lead">Aula 2 — Conceitos</p>
+
+  <div class="card def">
+    <b>Notação assintótica</b> é a linguagem usada para descrever o tempo assintótico de um algoritmo em termos de funções cujo domínio é ℕ = {0, 1, 2, 3, …}. É o vocabulário do projeto e análise de algoritmos. É <b>independente</b> de arquitetura, linguagem ou compilador e serve para <b>comparar algoritmos</b> que resolvem o mesmo problema.
+  </div>
+  <p>Ela ignora constantes (dependem do sistema) e termos de menor ordem (ficam irrelevantes quando n cresce) e costuma expressar o <b>pior caso</b> por meio de funções T(n).</p>
+
+  <h3>Θ (Theta) — limite assintótico justo</h3>
+  <div class="card def">
+    Θ(g(n)) = { f(n) : existem constantes positivas c₁, c₂, n₀ tais que<br>
+    <b>0 ≤ c₁·g(n) ≤ f(n) ≤ c₂·g(n) para todo n ≥ n₀</b> }<br>
+    f(n) fica “espremida” entre dois múltiplos de g(n).
+  </div>
+  <p><b>Exemplo do slide:</b> f(n) = 2n² + 100n ∈ Θ(n²) com c₁ = 2, c₂ = 4, n₀ = 50. Conferindo: 2n² ≤ 2n² + 100n sempre; 2n² + 100n ≤ 4n² ⇔ 100n ≤ 2n² ⇔ n ≥ 50.</p>
+  <p>Contra-exemplo: 6n³ ≠ Θ(n²), pois 6n³ ≤ c₂n² seria falso para n grande.</p>
+  <p>Para um polinômio de grau d com aₐ &gt; 0: Θ(n<sup>d</sup>). Constante: Θ(n⁰) = Θ(1).</p>
+
+  <h3>O (Big-oh) — limite superior</h3>
+  <div class="card def">
+    O(g(n)) = { f(n) : existem c &gt; 0 e n₀ tais que <b>0 ≤ f(n) ≤ c·g(n) para todo n ≥ n₀</b> }<br>
+    Para n ≥ n₀, f(n) está <b>abaixo</b> de c·g(n).
+  </div>
+  <ul>
+    <li>Θ(g(n)) ⊆ O(g(n)): se f = Θ(g) então f = O(g).</li>
+    <li>n ∈ O(n²) ✔, mas n ∉ Θ(n²) ✘ (O não precisa ser justo).</li>
+    <li>“O tempo de execução no pior caso é O(n²)” vale para <b>qualquer entrada</b> do Bubble Sort. Já a ordenação por inserção pode ser Θ(n) dependendo da entrada.</li>
+  </ul>
+
+  <h3>Ω (Omega) — limite inferior</h3>
+  <div class="card def">
+    Ω(g(n)) = { f(n) : existem c &gt; 0 e n₀ tais que <b>0 ≤ c·g(n) ≤ f(n) para todo n ≥ n₀</b> }<br>
+    Se o tempo é Ω(g(n)), ele será <b>no mínimo</b> c·g(n).
+  </div>
+
+  <h3>Teorema</h3>
+  <div class="card ok"><b>f(n) = Θ(g(n)) ⇔ f(n) = O(g(n)) <u>e</u> f(n) = Ω(g(n))</b><br>
+  Na prática: provamos os limites superior e inferior para demonstrar um limite justo.</div>
+
+  <h3>o (little-oh) e ω (little-omega) — limites <i>não</i> justos</h3>
+  <div class="tablewrap"><table>
+    <tr><th></th><th>Definição</th><th>Exemplos</th></tr>
+    <tr><td><b>o(g)</b></td><td>para <u>qualquer</u> c &gt; 0, existe n₀ com 0 ≤ f(n) &lt; c·g(n) para n ≥ n₀ (limite superior não justo)</td><td>2n = o(n²) ✔<br>2n² ≠ o(n²)</td></tr>
+    <tr><td><b>ω(g)</b></td><td>para <u>qualquer</u> c &gt; 0, existe n₀ com 0 ≤ c·g(n) &lt; f(n) (limite inferior não justo)</td><td>n² = ω(n) ✔<br>n ≠ ω(n)</td></tr>
+  </table></div>
+
+  <h3>Resumo comparativo</h3>
+  <div class="tablewrap"><table>
+    <tr><th>Notação</th><th>Ideia</th><th>Analogia</th></tr>
+    <tr><td>O</td><td>limite superior (“no máximo”)</td><td>f ≤ g</td></tr>
+    <tr><td>Ω</td><td>limite inferior (“no mínimo”)</td><td>f ≥ g</td></tr>
+    <tr><td>Θ</td><td>limite justo (O e Ω ao mesmo tempo)</td><td>f = g</td></tr>
+    <tr><td>o</td><td>superior estrito</td><td>f &lt; g</td></tr>
+    <tr><td>ω</td><td>inferior estrito</td><td>f &gt; g</td></tr>
+  </table></div>
+</section>
+
+<!-- ===================== RECORRÊNCIAS ===================== -->
+<section class="page" id="recorrencias">
+  <h2>3 · Recorrências</h2>
+  <p class="lead">Como descobrir a complexidade de algoritmos <b>recursivos</b>? Resolvendo recorrências.</p>
+
+  <div class="card def">
+    Uma <b>recorrência</b> é uma expressão que dá o valor de uma função em termos de valores anteriores da mesma função. É difícil achar o tempo exato de um algoritmo recursivo, mas podemos <b>estabelecer uma recorrência</b> T(n) que descreve esse tempo.
+  </div>
+
+  <h3>Exemplos</h3>
+  <p><b>Fibonacci:</b> F(0) = 0, F(1) = 1, F(n) = F(n−1) + F(n−2) para n ≥ 2. (Ordem de crescimento: exponencial.)</p>
+  <p><b>Fatorial:</b> fat(0) = 1; fat(n) = n · fat(n−1). O tempo é <code>T(0) = 1</code>, <code>T(n) = T(n−1) + 1</code> ⇒ T(n) = n + 1 = O(n).</p>
+  <p><b>Resolver</b> uma recorrência = achar uma fórmula que dê o valor da função <i>diretamente</i> em termos de n (ex.: n², 2ⁿ, log n).</p>
+  <div class="card tip">Toda recorrência precisa de um <b>caso base</b>. Ex.: com F(n) = F(n−1) + 3n + 2, o caso F(1) = 1 dá F(n) = (3n² + 7n)/2 − 4, mas F(1) = 10 dá (3n² + 7n)/2 + 5. Bases diferentes ⇒ soluções diferentes (mesma ordem, Θ(n²)).</div>
+
+  <h3>Quatro formas de resolver</h3>
+  <div class="tablewrap"><table>
+    <tr><th>Método</th><th>Característica</th></tr>
+    <tr><td><b>Substituição</b></td><td>Formal; abrange <u>todas</u> as recorrências; exige uma <b>estimativa</b> inicial que é provada por <b>indução</b>.</td></tr>
+    <tr><td><b>Árvore de recursão</b></td><td>Informal; ótima para obter a estimativa inicial.</td></tr>
+    <tr><td><b>Método mestre</b></td><td>Simples de aplicar, mas restrito a um conjunto de recorrências (<a href="#mestre">tópico 4</a>).</td></tr>
+    <tr><td>Divisão e conquista</td><td>É o paradigma que gera as recorrências (<a href="#dc">tópico 5</a>).</td></tr>
+  </table></div>
+
+  <h3>Prova por indução matemática</h3>
+  <p>Prova a verdade de um número infinito de proposições. Passos: <b>(1) hipótese</b>, <b>(2) passo base</b>, <b>(3) passo indutivo</b> (supor para n, provar para n + 1).</p>
+  <div class="card"><b>Exemplo do slide:</b> “2n é par”.<br>
+  Base: n = 1 → 2·1 = 2 (par) ✔.<br>
+  Passo: supondo 2n par, 2(n + 1) = 2n + 2 = (par) + 2 = par ✔.</div>
+
+  <h3>Método da substituição</h3>
+  <ol>
+    <li><b>Estimar</b> uma solução.</li>
+    <li>Provar por <b>indução</b> que a estimativa está correta.</li>
+  </ol>
+  <p>A estimativa vale para limites superiores (O) ou inferiores (Ω). Para limite justo (Θ), prove os dois.</p>
+
+  <h3>Exemplo completo: busca binária</h3>
+  <pre><code>busca(lista, valor) {
+  x = valor do meio da lista
+  se valor = x           retorna verdadeiro
+  se valor &lt; x           retorna busca(início até x, valor)
+  se valor &gt; x           retorna busca(de x até o final, valor)
+  senão                  retorna falso
+}</code></pre>
+  <p>A cada chamada, metade da lista é descartada. Como n pode ser ímpar, usamos <b>piso</b> (⌊ ⌋, arredonda para baixo):</p>
+  <div class="card">
+    <b>T(1) = 1</b> (caso base) &nbsp;&nbsp; <b>T(n) = T(⌊n/2⌋) + 1</b> para n &gt; 1<br><br>
+    <b>Resolvendo para n = 2ᵏ (expansão):</b><br>
+    T(n) = T(n/2) + 1 = T(n/4) + 2 = T(n/8) + 3 = … = T(n/2ᵏ) + k<br>
+    Quando n/2ᵏ = 1, ou seja, k = log₂ n: T(n) = T(1) + log n = <b>log n + 1</b>.<br><br>
+    <b>Cuidado:</b> isso só vale para n = 2ᵏ, é uma <i>estimativa</i>. Falta provar por indução que T(n) ≤ log n + 1 para <u>todo</u> n:<br>
+    • Base: T(1) = 1 = log 1 + 1 ✔<br>
+    • Passo (n &gt; 1): T(n) = T(⌊n/2⌋) + 1 ≤ (log⌊n/2⌋ + 1) + 1 ≤ log(n/2) + 2 = log n − 1 + 2 = <b>log n + 1</b> ✔<br>
+    Logo T(n) = O(log n).
+  </div>
+  <p>Geralmente a estimativa já vem dada na prova — basta provar. Se não vier, “chute” uma e tente provar.</p>
+
+  <h3>Árvore de recursão</h3>
+  <p>Maneira gráfica de ver as chamadas recursivas. Cada nó é uma instância do problema; se ela chama outras, elas são nós filhos; cada nó é rotulado com o tempo gasto <b>apenas nas operações locais</b> (sem contar as chamadas recursivas).</p>
+  <div class="card">
+    <b>Exemplo T(n) = 2T(n/2) + n</b> (merge sort):<br>
+    <pre><code>nível 0:            n                    → custo n
+nível 1:      n/2       n/2              → custo n
+nível 2:   n/4  n/4   n/4  n/4           → custo n
+   ...
+nível log n: 1 1 1 1 ... 1               → custo n</code></pre>
+    São <b>log n</b> níveis, cada um custando <b>n</b> ⇒ total <b>n log n</b>. Esse resultado é o “chute” que depois se prova por substituição (T(n) ≤ c·n·log n).
+  </div>
+</section>
+
+<!-- ===================== MESTRE ===================== -->
+<section class="page" id="mestre">
+  <h2>4 · Método mestre</h2>
+  <p class="lead">Receita pronta para recorrências da forma <b>T(n) = a·T(n/b) + f(n)</b>.</p>
+
+  <div class="card tip">
+    <b>Condições:</b> a ≥ 1, b &gt; 1, e f(n) deve estar nos inteiros não negativos. “a” = número de subproblemas; “n/b” = tamanho de cada um; f(n) = custo de dividir + combinar.
+  </div>
+
+  <h3>Passo a passo</h3>
+  <ol>
+    <li>Identifique <b>a</b>, <b>b</b> e <b>f(n)</b>.</li>
+    <li>Calcule <b>n<sup>log<sub>b</sub>a</sup></b> (o “custo das folhas”).</li>
+    <li>Compare f(n) com n<sup>log<sub>b</sub>a</sup>:</li>
+  </ol>
+  <div class="tablewrap"><table>
+    <tr><th>Caso</th><th>Condição</th><th>Resultado</th></tr>
+    <tr><td><b>1</b></td><td>f(n) = O(n<sup>log<sub>b</sub>a − ε</sup>) — f cresce <u>menos</u> (polinomialmente)</td><td><b>T(n) = Θ(n<sup>log<sub>b</sub>a</sup>)</b></td></tr>
+    <tr><td><b>2</b></td><td>f(n) = Θ(n<sup>log<sub>b</sub>a</sup>) — crescem <u>igual</u></td><td><b>T(n) = Θ(n<sup>log<sub>b</sub>a</sup> · log n)</b></td></tr>
+    <tr><td><b>3</b></td><td>f(n) = Ω(n<sup>log<sub>b</sub>a + ε</sup>) — f cresce <u>mais</u> (polinomialmente) <b>e</b> a·f(n/b) ≤ c·f(n) com c &lt; 1 (regularidade)</td><td><b>T(n) = Θ(f(n))</b></td></tr>
+  </table></div>
+  <p>Truque de memória: <b>quem “ganha”</b> a comparação define a resposta; se empatar, multiplica por log n.</p>
+
+  <h3>Exemplos resolvidos</h3>
+  <div class="card">
+    <b>T(n) = 2T(n/2) + n</b> (merge sort): a=2, b=2, n<sup>log₂2</sup> = n. f(n) = n → empate ⇒ caso 2 ⇒ <b>Θ(n log n)</b>.<br><br>
+    <b>T(n) = 4T(n/2) + n</b>: n<sup>log₂4</sup> = n². f = n é menor ⇒ caso 1 ⇒ <b>Θ(n²)</b>.<br><br>
+    <b>T(n) = T(n/2) + 1</b> (busca binária): a=1, b=2, n⁰ = 1. f = 1 → empate ⇒ caso 2 ⇒ <b>Θ(log n)</b>.<br><br>
+    <b>T(n) = T(n/2) + n</b>: n⁰ = 1, f = n maior ⇒ caso 3 (regularidade: n/2 ≤ c·n com c = ½) ⇒ <b>Θ(n)</b>.<br><br>
+    <b>T(n) = 9T(n/3) + n</b>: n<sup>log₃9</sup> = n², f = n menor ⇒ caso 1 ⇒ <b>Θ(n²)</b>.
+  </div>
+
+  <h3>Quando <u>não</u> se pode usar o método mestre</h3>
+  <div class="tablewrap"><table>
+    <tr><th>Situação</th><th>Exemplo</th></tr>
+    <tr><td>Redução por subtração (não é n/b)</td><td>Fibonacci: T(n) = T(n−1) + T(n−2) + 1</td></tr>
+    <tr><td>Subproblemas de tamanhos diferentes (não dá pra achar a e b)</td><td>T(n) = T(n/2) + T(n/4) + n</td></tr>
+    <tr><td>f(n) <b>não é polinomialmente</b> maior/menor que n<sup>log<sub>b</sub>a</sup></td><td>T(n) = 2T(n/2) + n lg n — n<sup>lg2</sup> = Θ(n) e n lg n não é polinomialmente maior que n (só um fator log)</td></tr>
+    <tr><td>a &lt; 1 ou b ≤ 1</td><td>T(n) = 0,5·T(n/2) + n</td></tr>
+  </table></div>
+  <p><b>Alternativas:</b> método da <b>substituição</b> (funciona para todas), <b>árvore de recursão</b> (para achar a estimativa), expansão/iteração, e o teorema de Akra-Bazzi (generaliza o mestre para subproblemas de tamanhos diferentes).</p>
+  <p>👉 Treine no <a href="#mestrelab">gerador de exercícios</a>.</p>
+</section>
+
+<!-- ===================== DC ===================== -->
+<section class="page" id="dc">
+  <h2>5 · Divisão e conquista e Merge sort</h2>
+  <p class="lead">Aula 4 — “Dividir para conquistar” (Júlio César)</p>
+
+  <div class="card def">
+    <b>Divisão e conquista</b> é uma abordagem de projeto de algoritmos com as etapas:<br>
+    <b>1. Divisão</b>: divide o problema em subproblemas, que são instâncias menores do mesmo problema (e cada um é dividido de novo).<br>
+    <b>2. Conquista</b>: resolve os subproblemas recursivamente e <b>combina</b> as soluções até chegar ao problema original.
+  </div>
+
+  <h3>Merge sort</h3>
+  <ul>
+    <li>Criado em 1945 por John von Neumann. Introduz o conceito de dividir para conquistar.</li>
+    <li>Complexidade temporal melhor que seleção, inserção e bubble sort.</li>
+  </ul>
+  <p><b>Funcionamento:</b></p>
+  <ol>
+    <li><b>Divide</b> a lista em sub-listas, e cada sub-lista em novas sub-listas, até que cada uma tenha apenas 1 item.</li>
+    <li><b>Conquista</b>: combina (intercala) as sub-listas de forma ordenada — compara os primeiros elementos de cada uma (“quem é menor?”) e coloca o menor na lista resultado, até acabarem.</li>
+  </ol>
+  <p>👉 Veja passo a passo no <a href="#vizmerge">simulador de merge sort</a>.</p>
+
+  <h3>Pseudocódigo</h3>
+  <pre><code>mergesort(A, p, r) {
+  se p &lt; r então
+    q = (p + r) / 2
+    mergesort(A, p, q)
+    mergesort(A, q+1, r)
+    intercala(A, p, q, r)
+}</code></pre>
+  <pre><code>intercala(A, p, q, r) {
+  para i de p até q:   B[i] = A[i]
+  para j de q+1 até r: B[r+q+1-j] = A[j]   // segunda metade copiada invertida
+  i = p;  j = r
+  para k de p até r:
+    se B[i] &lt;= B[j]:  A[k] = B[i]; i = i + 1
+    senão:            A[k] = B[j]; j = j - 1
+}</code></pre>
+
+  <h3>Complexidade</h3>
+  <div class="card">
+    Custos do slide: 1 (teste) + 1 (cálculo de q) + T(n/2) + T(n/2) + (6n + 5) do intercala.<br>
+    Recorrência: <b>T(n) = 2T(n/2) + n</b> (o termo linear vem do intercala).<br>
+    • Pela árvore: log n níveis × n por nível = n log n.<br>
+    • Pelo mestre: caso 2 ⇒ Θ(n log n).<br>
+    • O slide resolve com as constantes e chega a 16·n·log n ⇒ <b>O(n log n)</b>.<br>
+    O merge sort faz n log n em <u>todos</u> os casos (melhor, médio, pior), mas usa memória extra O(n) (vetor B).
+  </div>
+</section>
+
+<!-- ===================== HEAP ===================== -->
+<section class="page" id="heap">
+  <h2>6 · Heap sort</h2>
+  <p class="lead">Aula 4 — Criado em 1964 por J. W. J. Williams</p>
+
+  <div class="card def">
+    <b>Heap</b> é uma estrutura de dados abstrata representada por uma <b>árvore binária</b> (guardada num vetor), com funções simples de manipulação. Implementa filas de prioridade com alta eficiência.
+  </div>
+  <ul>
+    <li>Todos os níveis são preenchidos, exceto possivelmente o último, que é preenchido da esquerda para a direita.</li>
+    <li>Num arranjo A: A[1] = raiz; pais sempre ficam à esquerda de seus filhos no vetor.</li>
+  </ul>
+
+  <h3>Índices (slide, vetor iniciando em 1)</h3>
+  <div class="tablewrap"><table>
+    <tr><th>Parent(i)</th><th>Left(i)</th><th>Right(i)</th></tr>
+    <tr><td>⌊i / 2⌋</td><td>2i</td><td>2i + 1</td></tr>
+  </table></div>
+  <p>No código C do slide o vetor começa em 0, então os filhos de i são <code>2i + 1</code> e <code>2i + 2</code>.</p>
+
+  <h3>Max heap × Min heap</h3>
+  <ul>
+    <li><b>Max heap</b>: pai sempre ≥ filhos, A[parent(i)] ≥ A[i]. <b>Usado na ordenação</b> (o maior fica no topo).</li>
+    <li><b>Min heap</b>: pai sempre ≤ filhos.</li>
+  </ul>
+  <p><b>Altura</b> de um nó = nº de arestas do caminho mais longo até uma folha. Altura do heap = altura da raiz = ⌊log n⌋. Operações no heap custam no máximo a altura: <b>O(log n)</b>.</p>
+
+  <h3>Algoritmo (código do slide)</h3>
+  <pre><code>heapSort(vet, N) {
+  for (i = (N-1)/2; i &gt;= 0; i--)      // 1) constrói o max heap
+    criaHeap(vet, i, N-1);
+  for (i = N-1; i &gt;= 1; i--) {        // 2) ordena
+    troca(vet[0], vet[i]);            //    maior vai p/ posição final
+    criaHeap(vet, 0, i-1);            //    conserta o heap (menor)
+  }
+}
+criaHeap(vet, i, f) {                  // "peneira" o nó i para baixo
+  aux = vet[i];  j = 2*i + 1;
+  while (j &lt;= f) {
+    if (j &lt; f &amp;&amp; vet[j] &lt; vet[j+1]) j = j + 1;   // escolhe o maior filho
+    if (aux &lt; vet[j]) { vet[i] = vet[j]; i = j; j = 2*i + 1; }
+    else j = f + 1;                                  // achou o lugar
+  }
+  vet[i] = aux;
+}</code></pre>
+
+  <h3>Passo a passo</h3>
+  <ol>
+    <li><b>Construir o max heap</b> a partir do vetor desordenado.</li>
+    <li><b>Trocar a raiz</b> (maior) com a última folha. O maior está agora na posição correta.</li>
+    <li><b>Remover</b> a última folha do heap (o heap encolhe em 1).</li>
+    <li>O novo topo pode violar a regra ⇒ <b>criaHeap</b> (peneirar): troca com o maior filho enquanto for menor que ele.</li>
+    <li>Repetir 2–4 até não sobrar nenhum nó. Resultado: lista em ordem crescente.</li>
+  </ol>
+  <p>👉 Veja no <a href="#vizheap">simulador de heap sort</a>.</p>
+
+  <h3>Por que é O(n log n)?</h3>
+  <div class="card">
+    • 1º laço (construção do heap): o slide indica <b>O(n)</b> (são ~n/2 chamadas, e a maioria dos nós está perto das folhas, então peneira pouco).<br>
+    • 2º laço: <b>n − 1</b> iterações, cada uma chama criaHeap com custo no máximo a altura, <b>O(log n)</b> ⇒ O((n − 1)·log n).<br>
+    • Total: n + (n − 1)·log n ⇒ <b>O(n log n)</b>.<br>
+    É n log n no melhor, médio e pior caso. Ordena <b>in-place</b> (memória extra O(1)).
+  </div>
+  <div class="card tip"><b>Comparações com outros:</b> mesma complexidade do merge sort; um pouco mais lento que o quick sort no caso médio, porém <b>melhor que ele no pior caso</b> (n log n × n²). Não é recomendado para valores pequenos de n.</div>
+</section>
+
+<!-- ===================== OUTROS ===================== -->
+<section class="page" id="outros">
+  <h2>7 · Bubble sort e Quick sort</h2>
+  <p class="lead">Cobrados na lista de revisão (questões 2, 8 e 9). Resumo para estudo.</p>
+
+  <h3>Bubble sort</h3>
+  <p>Percorre a lista comparando pares adjacentes e trocando os que estão fora de ordem; a cada passada o maior elemento “borbulha” até o final.</p>
+  <pre><code>bubble(v, n) {
+  para i de 0 até n-2:
+    trocou = falso
+    para j de 0 até n-2-i:
+      se v[j] &gt; v[j+1]: troca(v[j], v[j+1]); trocou = verdadeiro
+    se não trocou: pare          // otimização
+}</code></pre>
+  <ul>
+    <li><b>Pior e médio caso: O(n²)</b> (dois laços aninhados; lista invertida).</li>
+    <li><b>Melhor caso: O(n)</b> — só se houver a flag de parada e a lista já estiver ordenada: uma passada sem trocas e termina. Sem a flag, é sempre n².</li>
+    <li><b>Desvantagem:</b> muito ineficiente para listas grandes (n² comparações e muitas trocas); elementos pequenos perto do fim andam só uma posição por passada.</li>
+  </ul>
+
+  <h3>Quick sort</h3>
+  <p>Escolhe um <b>pivô</b>, particiona a lista (menores à esquerda, maiores à direita) e ordena recursivamente cada lado. Também é divisão e conquista.</p>
+  <ul>
+    <li><b>Caso médio/melhor: O(n log n)</b> — o pivô divide a lista em partes parecidas.</li>
+    <li><b>Pior caso: O(n²)</b> — quando o pivô é sempre o menor ou o maior elemento (ex.: lista já ordenada ou invertida com pivô = primeiro/último). As partições ficam n−1 e 0 ⇒ T(n) = T(n−1) + n ⇒ n².</li>
+    <li><b>Como evitar:</b> pivô <b>aleatório</b>, <b>mediana de três</b> (primeiro, meio, último) ou embaralhar a lista antes.</li>
+  </ul>
+
+  <h3>Comparativo</h3>
+  <div class="tablewrap"><table>
+    <tr><th>Algoritmo</th><th>Melhor</th><th>Médio</th><th>Pior</th><th>Memória extra</th></tr>
+    <tr><td>Bubble</td><td>O(n)*</td><td>O(n²)</td><td>O(n²)</td><td>O(1)</td></tr>
+    <tr><td>Merge</td><td>n log n</td><td>n log n</td><td>n log n</td><td>O(n)</td></tr>
+    <tr><td>Heap</td><td>n log n</td><td>n log n</td><td>n log n</td><td>O(1)</td></tr>
+    <tr><td>Quick</td><td>n log n</td><td>n log n</td><td>n²</td><td>O(log n) (pilha)</td></tr>
+  </table></div>
+  <p style="font-size:.85rem;color:var(--muted)">* com a flag de parada antecipada. Merge/quick sort não são detalhados nos slides fornecidos para quick e bubble; esta seção usa conhecimento padrão para cobrir a lista de revisão.</p>
+</section>
+
+<!-- ===================== PROVA ===================== -->
+<section class="page" id="prova">
+  <h2>⏱️ Prova simulada — Método mestre</h2>
+  <p class="lead">Só o método mestre cai na prova, então esta simulação sorteia recorrências do banco (casos 1, 2, 3 e as “armadilhas” em que o método não se aplica) e questões de teoria. Sem feedback até o fim.</p>
+  <div class="card" id="examSetup">
+    <div class="row">
+      <label>Questões: <select id="exQ"><option>10</option><option selected>15</option><option>20</option></select></label>
+      <label>Tempo: <select id="exT"><option value="20">20 min</option><option value="30" selected>30 min</option><option value="60">60 min</option><option value="0">sem limite</option></select></label>
+      <button id="exStart">Iniciar prova</button>
+    </div>
+    <div id="exHist" style="color:var(--muted);font-size:.9rem"></div>
+  </div>
+  <div id="exArea"></div>
+</section>
+
+<!-- ===================== QUIZ ===================== -->
+<section class="page" id="quiz">
+  <h2>📝 Quiz de múltipla escolha</h2>
+  <p class="lead">Cada questão traz explicação. Erros ficam registrados para você refazer.</p>
+  <div class="card" id="quizSetup">
+    <div class="row">
+      <label>Tema:
+        <select id="quizTopic">
+          <option value="all">Todos</option>
+          <option value="conceitos">Conceitos e código</option>
+          <option value="notacoes">Notações assintóticas</option>
+          <option value="mestre">⭐ Método mestre (foco da prova)</option>
+          <option value="recorrencias">Recorrências e mestre</option>
+          <option value="algoritmos">Algoritmos (merge, heap, bubble, quick)</option>
+          <option value="erradas">Só as que errei</option>
+        </select>
+      </label>
+      <label>Quantidade:
+        <select id="quizCount"><option>10</option><option>20</option><option>30</option><option value="999">Todas</option></select>
+      </label>
+      <button id="quizStart">Começar</button>
+    </div>
+  </div>
+  <div id="quizArea"></div>
+</section>
+
+<!-- ===================== DISSERTATIVAS ===================== -->
+<section class="page" id="dissertativas">
+  <h2>✍️ Lista de revisão G1</h2>
+  <p class="lead">As 17 questões do professor. Escreva sua resposta primeiro, depois compare com a resposta-modelo e marque como “Acertei” ou “Revisar”.</p>
+  <div class="bar"><i id="dissBar" style="width:0"></i></div>
+  <p id="dissCount" style="color:var(--muted)"></p>
+  <div id="dissList"></div>
+</section>
+
+<!-- ===================== MESTRE LAB ===================== -->
+<section class="page" id="mestrelab">
+  <h2>🎲 Treino do método mestre</h2>
+  <p class="lead">Recorrências geradas aleatoriamente: T(n) = a·T(n/b) + nᵈ. Escolha o caso e a solução.</p>
+  <div class="card">
+    <div id="mlProb" style="font-size:1.3rem;font-weight:600"></div>
+    <div id="mlOpts"></div>
+    <div id="mlExp" class="expl" style="display:none"></div>
+    <div class="row"><button id="mlNext">Nova recorrência</button><span id="mlScore" style="color:var(--muted)"></span></div>
+  </div>
+</section>
+
+<!-- ===================== CRESCIMENTO ===================== -->
+<section class="page" id="crescimento">
+  <h2>📈 Ordem de crescimento</h2>
+  <p class="lead">Quantas instruções cada ordem executa para um dado n, e quanto tempo isso levaria (1 milhão de instruções por segundo — mesma escala da tabela do slide, em que 2³⁰ ≈ 18 min).</p>
+  <div class="card">
+    <div class="row"><label>n = <input type="number" id="gN" value="30" min="1" step="1" style="width:130px"></label>
+    <span style="color:var(--muted)">(experimente 10, 30, 50, 100, 1000, 1000000)</span></div>
+    <div class="tablewrap"><table id="gTable"></table></div>
+  </div>
+  <canvas id="gCanvas" width="640" height="360"></canvas>
+  <p style="color:var(--muted);font-size:.85rem">Gráfico para n de 1 a 12. Repare como 2ⁿ e n² disparam enquanto log n e n quase não saem do lugar.</p>
+</section>
+
+<!-- ===================== VIZ MERGE ===================== -->
+<section class="page" id="vizmerge">
+  <h2>🔀 Simulador de Merge sort</h2>
+  <p class="lead">Veja a divisão (até 1 item) e depois a conquista (intercalação).</p>
+  <div class="card">
+    <div class="row">
+      <input id="mInput" value="7 5 2 4 1 6 3 0" style="min-width:220px" aria-label="Lista">
+      <button id="mLoad">Carregar</button><button class="ghost" id="mRand">Aleatória</button>
+    </div>
+    <div class="row">
+      <button class="ghost" id="mPrev">◀ Anterior</button><button id="mNext">Próximo ▶</button>
+      <button class="ghost" id="mAuto">▶ Auto</button><button class="ghost" id="mReset">↺</button>
+      <span id="mInfo" style="color:var(--muted)"></span>
+    </div>
+    <div class="msg" id="mMsg"></div>
+    <div id="mViz"></div>
+  </div>
+</section>
+
+<!-- ===================== VIZ HEAP ===================== -->
+<section class="page" id="vizheap">
+  <h2>🌳 Simulador de Heap sort</h2>
+  <p class="lead">Fase 1: construir o max heap. Fase 2: trocar a raiz com a última folha e reconstruir.</p>
+  <div class="card">
+    <div class="row">
+      <input id="hInput" value="6 5 3 1 8 7 2 4" style="min-width:220px" aria-label="Lista">
+      <button id="hLoad">Carregar</button><button class="ghost" id="hRand">Aleatória</button>
+    </div>
+    <div class="row">
+      <button class="ghost" id="hPrev">◀ Anterior</button><button id="hNext">Próximo ▶</button>
+      <button class="ghost" id="hAuto">▶ Auto</button><button class="ghost" id="hReset">↺</button>
+      <span id="hInfo" style="color:var(--muted)"></span>
+    </div>
+    <div class="msg" id="hMsg"></div>
+    <div class="tree" id="hTree"></div>
+    <div class="vizrow" id="hArr"></div>
+    <p style="color:var(--muted);font-size:.85rem">Cinza-azulado = elementos ativos · verde = já na posição final · azul = comparando · amarelo = trocando.</p>
+  </div>
+</section>
+</main>
+</div>
+<script src="data.js"></script>
+<script src="data2.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
